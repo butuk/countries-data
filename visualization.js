@@ -1,21 +1,29 @@
 'use strict';
 import * as d3 from 'https://cdn.jsdelivr.net/npm/d3@7/+esm';
 
+//Data source
+const dataPath = 'data.json';
+
 //Sizing
 const VIZ = {
     WIDTH: 600,
     HEIGHT: 400,
     MARGIN: {
         LEFT: 0,
-        TOP: 20,
-        RIGHT: 50,
-        BOTTOM: 60,
+        TOP: 0,
+        RIGHT: 0,
+        BOTTOM: 0,
     }
 };
 const width = VIZ.WIDTH - VIZ.MARGIN.LEFT - VIZ.MARGIN.RIGHT;
 const height = VIZ.HEIGHT - VIZ.MARGIN.TOP - VIZ.MARGIN.BOTTOM;
 
-//Timer and time
+const LEGEND = {
+    WIDTH: 600,
+    HEIGHT: 50,
+}
+
+//Time and timer variables
 let dynamics = true;
 const start = 0;
 const initial = 1800;
@@ -31,10 +39,18 @@ const svg = d3.select('#container')
     .attr('preserveAspectRatio', 'xMinYMin meet')
 const vis = svg.append('g')
     .attr('transform', `translate(${VIZ.MARGIN.LEFT} ${VIZ.MARGIN.TOP})`)
+
+//Legend
+/*const legend = d3.select('#legend')
+  .attr('viewBox', `0 0 ${LEGEND.WIDTH} ${LEGEND.HEIGHT}`)
+  .attr('preserveAspectRatio', 'xMinYMin meet')
+  .append('svg').append('g')*/
+
+//Adding text
 const header = createText('header', (VIZ.MARGIN.LEFT + width), VIZ.MARGIN.TOP, initial, 'end', 'hanging');
 
 //Loading data and draw visualization
-d3.json('./data/countries.json').then(dataset => {
+d3.json(dataPath).then(dataset => {
     const data = dataset.map(element => {
         return element['countries'].filter(country => {
             return (country.income && country.life_exp && country.population);
@@ -50,12 +66,12 @@ d3.json('./data/countries.json').then(dataset => {
     const lifeScale = makeLinearScale(getRange(data, 'life_exp'), 0, width);
     const incomeScale = makeLogScale(getRange(data, 'income'), height, 0, 3);
     const populationScale = makeLinearScale(getRange(data, 'population'), 1, 6500);
-    const continentScale = makeOrdinalScale(getRange(data, 'continent'), d3.schemeSet1);
+    const continentScale = makeOrdinalScale(getRange(data, 'continent'), d3.schemeTableau10);
     const scalesArr = [lifeScale, incomeScale, populationScale, continentScale];
 
     //Draw axis
-    drawAxis('axisRight', incomeScale, 5, VIZ.MARGIN.LEFT, VIZ.MARGIN.TOP);
-    drawAxis('axisBottom', lifeScale, 5, VIZ.MARGIN.LEFT, (VIZ.MARGIN.TOP + height));
+    drawAxis('axisRight', incomeScale, 3, VIZ.MARGIN.LEFT, VIZ.MARGIN.TOP);
+    drawAxis('axisTop', lifeScale, 5, VIZ.MARGIN.LEFT, (VIZ.MARGIN.TOP + height));
 
     //Draw visualization by interval
     let interval = d3.interval(drawVizByInterval(data, scalesArr, data.length), speed);
@@ -67,7 +83,8 @@ d3.json('./data/countries.json').then(dataset => {
 }).catch(error => {
     console.log(error);
 });
-//Create text
+
+//Create text function
 function createText(txtClass, x, y, text, textAnchor, verticalAligment) {
     const txtElement = svg.append('text')
         .attr('class', `${txtClass}`)
@@ -108,7 +125,7 @@ function drawViz(data, x, y, area, color) {
     const points = vis.selectAll('circle').data(data);
     points.exit().remove();
     points.enter().append('circle')
-        .attr('opacity', 0.5)
+        .attr('opacity', 0.7)
         .merge(points)
         .attr('cx', d => x(d.life_exp))
         .attr('cy', d => y(d.income))
@@ -145,7 +162,7 @@ function makeOrdinalScale(rangeIn, rangeOut) {
         .range(rangeOut)
 }
 
-//Gather data margins
+//Get data margins
 function getRange(dataset, param) {
     const parameters = new Set();
     for (let element of dataset) {
