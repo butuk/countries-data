@@ -21,6 +21,7 @@ const height = VIZ.HEIGHT - VIZ.MARGIN.TOP - VIZ.MARGIN.BOTTOM;
 const LEGEND = {
     WIDTH: 600,
     HEIGHT: 50,
+    MARGIN: 20,
 }
 
 //Time and timer variables
@@ -40,14 +41,14 @@ const svg = d3.select('#container')
 const vis = svg.append('g')
     .attr('transform', `translate(${VIZ.MARGIN.LEFT} ${VIZ.MARGIN.TOP})`)
 
-//Legend
-/*const legend = d3.select('#legend')
+//Place for legend
+const legend = d3.select('#legend')
+  .append('svg')
   .attr('viewBox', `0 0 ${LEGEND.WIDTH} ${LEGEND.HEIGHT}`)
   .attr('preserveAspectRatio', 'xMinYMin meet')
-  .append('svg').append('g')*/
 
 //Adding text
-const header = createText('header', (VIZ.MARGIN.LEFT + width), VIZ.MARGIN.TOP, initial, 'end', 'hanging');
+const header = createText(svg, 'header', initial, (VIZ.MARGIN.LEFT + width), VIZ.MARGIN.TOP);
 
 //Loading data and draw visualization
 d3.json(dataPath).then(dataset => {
@@ -73,6 +74,9 @@ d3.json(dataPath).then(dataset => {
     drawAxis('axisRight', incomeScale, 3, VIZ.MARGIN.LEFT, VIZ.MARGIN.TOP);
     drawAxis('axisTop', lifeScale, 5, VIZ.MARGIN.LEFT, (VIZ.MARGIN.TOP + height));
 
+    //Create legend
+    buildLegend(legend, getRange(data, 'continent'));
+
     //Draw visualization by interval
     let interval = d3.interval(drawVizByInterval(data, scalesArr, data.length), speed);
     controlInterval(interval, document.querySelector('svg'), drawVizByInterval(data, scalesArr, data.length), speed);
@@ -84,18 +88,20 @@ d3.json(dataPath).then(dataset => {
     console.log(error);
 });
 
-//Create text function
-function createText(txtClass, x, y, text, textAnchor, verticalAligment) {
-    const txtElement = svg.append('text')
-        .attr('class', `${txtClass}`)
-        .attr('x', x)
-        .attr('y', y)
-        .attr('text-anchor', textAnchor)
-        .attr('text', text)
+//Create legend
+function buildLegend(place, items) {
+    const widthsArr = [0];
 
-        verticalAligment ? txtElement.attr('alignment-baseline', verticalAligment) : txtElement.attr('alignment-baseline', 'auto')
+    items.forEach((item, index) => {
+        const itemPlace = place.append('g')
+          .attr('class', `legend-item-${index}`)
+          .attr('transform', `translate(${widthsArr.reduce((a, b) => a + b)} 0)`);
 
-    return txtElement;
+        createText(itemPlace, 'legend-item',`${item}`)
+
+        const width = document.querySelector(`.legend-item-${index}`).getBoundingClientRect().width;
+        widthsArr.push((width + + LEGEND.MARGIN));
+    })
 }
 
 //Make interval controlled by element
@@ -147,12 +153,12 @@ function drawAxis(type, scale, ticks, left, top) {
 //Make scales of specified types
 function makeLinearScale(range, from, to) {
     return d3.scaleLinear()
-        .domain(range)
+        .domain(d3.extent(range))
         .range([from, to]);
 }
 function makeLogScale(range, from, to, base) { // income
      return d3.scaleLog()
-         .domain(range)
+         .domain(d3.extent(range))
          .range([from, to])
          .base(base);
 }
@@ -170,5 +176,14 @@ function getRange(dataset, param) {
             parameters.add(country[param]);
         }
     }
-    return d3.extent(Array.from(parameters));
+    return Array.from(parameters);
+}
+
+//Create text function
+function createText(place, txtClass, text, x = 0, y = 0) {
+    return place.append('text')
+      .attr('class', `${txtClass}`)
+      .attr('x', x)
+      .attr('y', y)
+      .text(text)
 }

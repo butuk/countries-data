@@ -12,10 +12,8 @@ $base-width: 1920;  // Базовый размер макета
     position: relative;
     margin-left: auto;
     margin-right: auto;
-
     margin-top: 5vh;
     width: 90vh;
-
     @media screen and (orientation: portrait) {
         margin-top: 5vw;
         width: 80vw;
@@ -30,14 +28,15 @@ h1 {
     line-height: 1.2;
     font-size: 5vh;
     margin-top: 5vh;
+    margin-bottom: 3vh;
     @media screen and (orientation: portrait) {
         font-size: 5vw;
         margin-top: 5vw;
+        margin-bottom: 3vw;
     }
 }
 
-#container {
-    //width: 100%;
+#container, #legend {
     resize: both;
     overflow: visible;
 }
@@ -52,4 +51,23 @@ svg {
     @media screen and (orientation: portrait) {
         font-size: 10vw;
     }
+    alignment-baseline: hanging;
+    text-anchor: end;
+}
+
+.legend-item {
+    alignment-baseline: hanging;
+    text-anchor: start;
+    margin-right: 1vh;
+    @media screen and (orientation: portrait) {
+        font-size: 1vw;
+    }
+}
+
+.axis {
+    font-size: 2vh;
+    @media screen and (orientation: portrait) {
+        font-size: 2vw;
+    }
+
 }

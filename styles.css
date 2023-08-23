@@ -70,15 +70,17 @@ h1 {
   line-height: 1.2;
   font-size: 5vh;
   margin-top: 5vh;
+  margin-bottom: 3vh;
 }
 @media screen and (orientation: portrait) {
   h1 {
     font-size: 5vw;
     margin-top: 5vw;
+    margin-bottom: 3vw;
   }
 }
 
-#container {
+#container, #legend {
   resize: both;
   overflow: visible;
 }
@@ -90,10 +92,32 @@ svg {
 
 .header {
   font-size: 10vh;
+  alignment-baseline: hanging;
+  text-anchor: end;
 }
 @media screen and (orientation: portrait) {
   .header {
     font-size: 10vw;
+  }
+}
+
+.legend-item {
+  alignment-baseline: hanging;
+  text-anchor: start;
+  margin-right: 1vh;
+}
+@media screen and (orientation: portrait) {
+  .legend-item {
+    font-size: 1vw;
+  }
+}
+
+.axis {
+  font-size: 2vh;
+}
+@media screen and (orientation: portrait) {
+  .axis {
+    font-size: 2vw;
   }
 }
 
