@@ -1,5 +1,7 @@
 'use strict';
 import * as d3 from 'https://cdn.jsdelivr.net/npm/d3@7/+esm';
+import {Scale} from './componens/Scale.js';
+import {Axis} from "./componens/Axis.js";
 
 //Data source
 const dataPath = 'data.json';
@@ -18,11 +20,21 @@ const VIZ = {
 const width = VIZ.WIDTH - VIZ.MARGIN.LEFT - VIZ.MARGIN.RIGHT;
 const height = VIZ.HEIGHT - VIZ.MARGIN.TOP - VIZ.MARGIN.BOTTOM;
 
+//Items sizes
+const from = 1;
+const to = 6500;
+
+//Base for axis with log scale (Income on y)
+const axisBaseY = 3;
+
 const LEGEND = {
     WIDTH: 600,
     HEIGHT: 50,
     MARGIN: 20,
 }
+
+//Color scale
+const colorScale = d3.schemeTableau10; // source: https://github.com/d3/d3-scale-chromatic
 
 //Time and timer variables
 let dynamics = true;
@@ -64,20 +76,21 @@ d3.json(dataPath).then(dataset => {
     });
 
     //Set scales
-    const lifeScale = makeLinearScale(getRange(data, 'life_exp'), 0, width);
-    const incomeScale = makeLogScale(getRange(data, 'income'), height, 0, 3);
-    const populationScale = makeLinearScale(getRange(data, 'population'), 1, 6500);
-    const continentScale = makeOrdinalScale(getRange(data, 'continent'), d3.schemeTableau10);
+    const lifeScale = new Scale('linear', getRange(data, 'life_exp'), 0, width);
+    const incomeScale = new Scale('log', getRange(data, 'income'), height, 0, axisBaseY);
+    const populationScale = new Scale('linear', getRange(data, 'population'), from, to);
+    const continentScale = new Scale('ordinal', getRange(data, 'continent'), colorScale);
+
     const scalesArr = [lifeScale, incomeScale, populationScale, continentScale];
 
     //Draw axis
-    drawAxis('axisRight', incomeScale, 3, VIZ.MARGIN.LEFT, VIZ.MARGIN.TOP);
-    drawAxis('axisTop', lifeScale, 5, VIZ.MARGIN.LEFT, (VIZ.MARGIN.TOP + height));
+    new Axis('right', incomeScale, 3).draw(svg, VIZ.MARGIN.LEFT, VIZ.MARGIN.TOP);
+    new Axis('top', lifeScale, 5).draw(svg, VIZ.MARGIN.LEFT, (VIZ.MARGIN.TOP + height));
 
-    //Create legend
+    //Draw legend
     buildLegend(legend, getRange(data, 'continent'));
 
-    //Draw visualization by interval
+    //Change visualization by interval
     let interval = d3.interval(drawVizByInterval(data, scalesArr, data.length), speed);
     controlInterval(interval, document.querySelector('svg'), drawVizByInterval(data, scalesArr, data.length), speed);
 
@@ -137,35 +150,6 @@ function drawViz(data, x, y, area, color) {
         .attr('cy', d => y(d.income))
         .attr('r', d => (Math.sqrt(area(d.population)/Math.PI)))
         .attr('fill', d => color(d.continent));
-}
-
-//Create axis
-function drawAxis(type, scale, ticks, left, top) {
-    const axis = d3[`${type}`](scale)
-        .tickSize(0)
-        .ticks(ticks)
-    svg.append('g')
-        .attr('transform', `translate(${left}, ${top})`)
-        .attr('class', `axis ${type}`)
-        .call(axis);
-}
-
-//Make scales of specified types
-function makeLinearScale(range, from, to) {
-    return d3.scaleLinear()
-        .domain(d3.extent(range))
-        .range([from, to]);
-}
-function makeLogScale(range, from, to, base) { // income
-     return d3.scaleLog()
-         .domain(d3.extent(range))
-         .range([from, to])
-         .base(base);
-}
-function makeOrdinalScale(rangeIn, rangeOut) {
-    return d3.scaleOrdinal()
-        .domain(rangeIn)
-        .range(rangeOut)
 }
 
 //Get data margins
