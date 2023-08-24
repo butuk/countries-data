@@ -58,16 +58,16 @@ svg {
 .legend-item {
     alignment-baseline: hanging;
     text-anchor: start;
-    margin-right: 1vh;
+    font-size: 2vh;
     @media screen and (orientation: portrait) {
-        font-size: 1vw;
+        font-size: 4vw;
     }
 }
 
 .axis {
     font-size: 2vh;
     @media screen and (orientation: portrait) {
-        font-size: 2vw;
+        font-size: 4vw;
     }
 
 }

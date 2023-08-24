@@ -2,6 +2,7 @@
 import * as d3 from 'https://cdn.jsdelivr.net/npm/d3@7/+esm';
 import {Scale} from './componens/Scale.js';
 import {Axis} from "./componens/Axis.js";
+import {Text} from "./componens/Text.js";
 
 //Data source
 const dataPath = 'data.json';
@@ -21,8 +22,8 @@ const width = VIZ.WIDTH - VIZ.MARGIN.LEFT - VIZ.MARGIN.RIGHT;
 const height = VIZ.HEIGHT - VIZ.MARGIN.TOP - VIZ.MARGIN.BOTTOM;
 
 //Items sizes
-const from = 1;
-const to = 6500;
+const sizeFrom = 1;
+const sizeTo = 6500;
 
 //Base for axis with log scale (Income on y)
 const axisBaseY = 3;
@@ -60,7 +61,9 @@ const legend = d3.select('#legend')
   .attr('preserveAspectRatio', 'xMinYMin meet')
 
 //Adding text
-const header = createText(svg, 'header', initial, (VIZ.MARGIN.LEFT + width), VIZ.MARGIN.TOP);
+const header = new Text(svg, 'header', initial, (VIZ.MARGIN.LEFT + width), VIZ.MARGIN.TOP);
+const labelY = new Text(svg, 'labelY', 'Life Expectancy', width/2, height/2);
+//labelY.rotate();
 
 //Loading data and draw visualization
 d3.json(dataPath).then(dataset => {
@@ -78,7 +81,7 @@ d3.json(dataPath).then(dataset => {
     //Set scales
     const lifeScale = new Scale('linear', getRange(data, 'life_exp'), 0, width);
     const incomeScale = new Scale('log', getRange(data, 'income'), height, 0, axisBaseY);
-    const populationScale = new Scale('linear', getRange(data, 'population'), from, to);
+    const populationScale = new Scale('linear', getRange(data, 'population'), sizeFrom, sizeTo);
     const continentScale = new Scale('ordinal', getRange(data, 'continent'), colorScale);
 
     const scalesArr = [lifeScale, incomeScale, populationScale, continentScale];
@@ -110,7 +113,7 @@ function buildLegend(place, items) {
           .attr('class', `legend-item-${index}`)
           .attr('transform', `translate(${widthsArr.reduce((a, b) => a + b)} 0)`);
 
-        createText(itemPlace, 'legend-item',`${item}`)
+        new Text(itemPlace, 'legend-item',`${item}`)
 
         const width = document.querySelector(`.legend-item-${index}`).getBoundingClientRect().width;
         widthsArr.push((width + + LEGEND.MARGIN));
@@ -161,13 +164,4 @@ function getRange(dataset, param) {
         }
     }
     return Array.from(parameters);
-}
-
-//Create text function
-function createText(place, txtClass, text, x = 0, y = 0) {
-    return place.append('text')
-      .attr('class', `${txtClass}`)
-      .attr('x', x)
-      .attr('y', y)
-      .text(text)
 }
