@@ -29,12 +29,6 @@ const sizeTo = 6500;
 //Base for axis with log scale (Income on y)
 const axisBaseY = 3;
 
-const LEGEND = {
-    WIDTH: 600,
-    HEIGHT: 50,
-    MARGIN: 20,
-}
-
 //Color scale
 const colorScale = d3.schemeTableau10; // source: https://github.com/d3/d3-scale-chromatic
 
