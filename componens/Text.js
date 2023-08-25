@@ -1,17 +1,18 @@
 export class Text {
 
-  constructor(text) {
+  constructor(text, txtClass = null) {
     this.text = text;
+    this.txtClass = txtClass;
   }
 
-  render(place, txtClass = null, x = 0, y = 0) {
+  render(place, x = 0, y = 0) {
     const where = place.append('g')
       .attr('transform', `translate(${x} ${y})`)
 
     this.block = where.append('text')
-      .attr('class', `${txtClass}`)
+      .attr('class', `${this.txtClass}`)
       .text(this.text)
 
-    return this;
+    return this.block;
   }
 }

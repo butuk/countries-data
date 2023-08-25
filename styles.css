@@ -52,12 +52,12 @@ table {
   --white: #DCD8D9;
 }
 
-.labelY, .labelX, .axis {
+a, .disclaimer, .labelY, .labelX, .axis {
   fill: var(--white);
   font-size: 2vh;
 }
 @media screen and (orientation: portrait) {
-  .labelY, .labelX, .axis {
+  a, .disclaimer, .labelY, .labelX, .axis {
     font-size: 2vw;
   }
 }
@@ -66,8 +66,8 @@ body {
   font-family: "Helvetica", sans-serif;
   color: var(--white);
   background: #3b3d3d;
-  background: linear-gradient(0deg, #1b1d1d, #3b3d3d);
-  height: 100vh;
+  background: linear-gradient(0deg, #0b0d0d, #1b1d1d);
+  height: 90vh;
 }
 
 #content {
@@ -75,13 +75,13 @@ body {
   left: -7vh;
   margin-left: auto;
   margin-right: auto;
-  margin-top: 5vh;
+  margin-top: 10vh;
   width: 90vh;
 }
 @media screen and (orientation: portrait) {
   #content {
     left: -4vw;
-    margin-top: 5vw;
+    margin-top: 10vw;
     width: 80vw;
     min-width: 300px;
   }
@@ -125,9 +125,9 @@ svg {
 .year {
   font-family: "Fira Mono", monospace;
   font-weight: bold;
-  color: #333333;
+  fill: var(--white);
   z-index: 100;
-  opacity: 0.2;
+  opacity: 0.075;
   letter-spacing: -1vh;
   font-size: 20vh;
   alignment-baseline: hanging;
@@ -148,6 +148,15 @@ svg {
   alignment-baseline: hanging;
   text-anchor: end;
   transform: rotate(-90deg);
+}
+
+a {
+  display: inline-block;
+  position: absolute;
+  right: 0;
+  text-decoration: underline;
+  color: var(--white);
+  opacity: 0.5;
 }
 
 /*# sourceMappingURL=styles.css.map */

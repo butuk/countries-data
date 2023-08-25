@@ -5,22 +5,14 @@ import {Axis} from "./componens/Axis.js";
 import {Text} from "./componens/Text.js";
 import {Range} from "./componens/Range.js";
 import {Interval} from "./componens/Interval.js";
-import {Canvas} from "./componens/Canvas.js";
+import {Svg} from "./componens/Svg.js";
+import {SvgGroup} from "./componens/SvgGroup.js";
 
 //Data source
 const dataPath = 'data.json';
 
 //Sizing
-const VIZ = {
-    WIDTH: 600,
-    HEIGHT: 350,
-    MARGIN: {
-        LEFT: 20,
-        TOP: 0,
-        RIGHT: 0,
-        BOTTOM: 25,
-    }
-};
+const VIZ = {WIDTH: 600, HEIGHT: 350, MARGIN: {LEFT: 20, TOP: 0, RIGHT: 0, BOTTOM: 25,}};
 const width = VIZ.WIDTH - VIZ.MARGIN.LEFT - VIZ.MARGIN.RIGHT;
 const height = VIZ.HEIGHT - VIZ.MARGIN.TOP - VIZ.MARGIN.BOTTOM;
 
@@ -28,31 +20,33 @@ const height = VIZ.HEIGHT - VIZ.MARGIN.TOP - VIZ.MARGIN.BOTTOM;
 const ticksX = 5;                       //Amount of ticks on x-axis
 const ticksY = 3;                       //Amount of ticks on y-axis
 const axisBaseY = 3;                    //Base for axis with log scale (Income range on y-axis)
-const sizeFrom = 1;                     //Smallest circle size
-const sizeTo = 13000;                   //Biggest circle size
-const opacity = .7;                     //Circles opacity
-const colorScale = d3.schemeAccent;  //Color range. Source: https://github.com/d3/d3-scale-chromatic
+const sizeFrom = 2;                     //Smallest circle size
+const sizeTo = 5000;                    //Biggest circle size
+const opacity = .8;                     //Circles opacity
+const colorScale = d3.schemeAccent;     //Color range. Source: https://github.com/d3/d3-scale-chromatic
 
 //Time and timer variables
 const initial = 1800;
-const start = 0;
+const start = 100;
 let time = start;
-const speed = 100; // in milliseconds
+const speed = 100; //Time speed. In milliseconds
+const duration = speed - 1; //Animation speed
 
 //Canvas
-const svg = new Canvas(VIZ.WIDTH, VIZ.HEIGHT).render('#container');
-const vis = svg.addGroup(VIZ.MARGIN.LEFT, VIZ.MARGIN.TOP);
+const svg = new Svg(VIZ.WIDTH, VIZ.HEIGHT, 'canvas').render('#container')
+const vis = new SvgGroup().render(svg, VIZ.MARGIN.LEFT, VIZ.MARGIN.TOP);
 
-// Timer will be controlled by clicking the canvas
-const controller = document.querySelector('svg');
+//Timer will be controlled by clicking the canvas
+const controller = document.querySelector('.canvas');
 
 //Adding text
-const year = new Text(initial + start).render(svg.block, 'year', (VIZ.MARGIN.LEFT + width), VIZ.MARGIN.TOP);
-new Text('Income').render(svg.block, 'labelY', 0, 0);
-new Text('Life expectancy').render(svg.block, 'labelX', (VIZ.MARGIN.LEFT + width), ((VIZ.MARGIN.TOP + height + VIZ.MARGIN.BOTTOM)));
+const year = new Text(initial + start, 'year').render(svg, (VIZ.MARGIN.LEFT + width), VIZ.MARGIN.TOP);
+new Text('GDP per capita, $', 'labelY').render(svg, 0, 0);
+new Text('Life expectancy, years', 'labelX').render(svg, (VIZ.MARGIN.LEFT + width), ((VIZ.MARGIN.TOP + height + VIZ.MARGIN.BOTTOM)));
 
 //Loading data and render visualization
 d3.json(dataPath).then(dataset => {
+
     const data = dataset.map(element => {
         return element['countries'].filter(country => {
             return (country.income && country.life_exp && country.population);
@@ -75,8 +69,8 @@ d3.json(dataPath).then(dataset => {
     const scalesArr = [lifeScale, incomeScale, populationScale, continentScale];
 
     //Render axis
-    new Axis(incomeScale).render(svg.block, VIZ.MARGIN.LEFT, VIZ.MARGIN.TOP, 'right', ticksY);
-    new Axis(lifeScale).render(svg.block, VIZ.MARGIN.LEFT, (VIZ.MARGIN.TOP + height), 'top', ticksX);
+    new Axis(incomeScale).render(svg, VIZ.MARGIN.LEFT, VIZ.MARGIN.TOP, 'right', ticksY);
+    new Axis(lifeScale).render(svg, VIZ.MARGIN.LEFT, (VIZ.MARGIN.TOP + height), 'top', ticksX);
 
     //Build legend
     buildLegend(range.get('continent'), colorScale);
@@ -110,21 +104,25 @@ function buildLegend(items, colors) {
 //Rendering visualization by interval
 function renderVizByInterval(data, scalesArr, amountOfTimes) {
     return () => {
-        time = (time < amountOfTimes) ? time + 1 : start;
+        time = (time < amountOfTimes - 1) ? time + 1 : start;
         renderViz(data[time], scalesArr)
-        year.block.text(String(time + initial));
+        year.text(String(time + initial));
     }
 }
 
 //Rendering visualization
 function renderViz(data, [x, y, area, color]) {
-    const points = vis.block.selectAll('circle').data(data);
+    const t = d3.transition().duration(duration);
+
+    const points = vis.selectAll('circle')
+      .data(data, d => d.country); // d => d.country
     points.exit().remove();
     points.enter().append('circle')
         .attr('opacity', opacity)
         .merge(points)
-        .attr('cx', d => x(d.life_exp))
-        .attr('cy', d => y(d.income))
-        .attr('r', d => (Math.sqrt(area(d.population)/Math.PI)))
-        .attr('fill', d => color(d.continent));
+            .transition(t)
+                .attr('cx', d => x(d.life_exp))
+                .attr('cy', d => y(d.income))
+                .attr('r', d => (Math.sqrt(area(d.population)/Math.PI)))
+                .attr('fill', d => color(d.continent))
 }
