@@ -3,6 +3,7 @@ import * as d3 from 'https://cdn.jsdelivr.net/npm/d3@7/+esm';
 import {Scale} from './componens/Scale.js';
 import {Axis} from "./componens/Axis.js";
 import {Text} from "./componens/Text.js";
+import {Range} from "./componens/Range.js";
 
 //Data source
 const dataPath = 'data.json';
@@ -54,14 +55,8 @@ const svg = d3.select('#container')
 const vis = svg.append('g')
     .attr('transform', `translate(${VIZ.MARGIN.LEFT} ${VIZ.MARGIN.TOP})`)
 
-//Place for legend
-const legend = d3.select('#legend')
-  .append('svg')
-  .attr('viewBox', `0 0 ${LEGEND.WIDTH} ${LEGEND.HEIGHT}`)
-  .attr('preserveAspectRatio', 'xMinYMin meet')
-
 //Adding text
-const header = new Text(initial).render(svg, 'header', (VIZ.MARGIN.LEFT + width), VIZ.MARGIN.TOP);
+const year = new Text(initial).render(svg, 'year', (VIZ.MARGIN.LEFT + width), VIZ.MARGIN.TOP);
 new Text('Income').render(svg, 'labelY', 50);
 
 //Loading data and draw visualization
@@ -77,11 +72,13 @@ d3.json(dataPath).then(dataset => {
         });
     });
 
+    const range = new Range(data);
+
     //Set scales
-    const lifeScale = new Scale('linear', getRange(data, 'life_exp'), 0, width);
-    const incomeScale = new Scale('log', getRange(data, 'income'), height, 0, axisBaseY);
-    const populationScale = new Scale('linear', getRange(data, 'population'), sizeFrom, sizeTo);
-    const continentScale = new Scale('ordinal', getRange(data, 'continent'), colorScale);
+    const lifeScale = new Scale('linear', range.get('life_exp'), 0, width);
+    const incomeScale = new Scale('log', range.get('income'), height, 0, axisBaseY);
+    const populationScale = new Scale('linear', range.get('population'), sizeFrom, sizeTo);
+    const continentScale = new Scale('ordinal', range.get('continent'), colorScale);
 
     const scalesArr = [lifeScale, incomeScale, populationScale, continentScale];
 
@@ -90,7 +87,7 @@ d3.json(dataPath).then(dataset => {
     new Axis(lifeScale).render(svg, VIZ.MARGIN.LEFT, (VIZ.MARGIN.TOP + height), 'top', 5);
 
     //Draw legend
-    buildLegend(legend, getRange(data, 'continent'));
+    buildLegend(range.get( 'continent'));
 
     //Change visualization by interval
     let interval = d3.interval(drawVizByInterval(data, scalesArr, data.length), speed);
@@ -102,20 +99,17 @@ d3.json(dataPath).then(dataset => {
 }).catch(error => {
     console.log(error);
 });
-
-//Create legend
-function buildLegend(place, items) {
-    const widthsArr = [0];
-
+//Createing legend
+const continentColor = d3.scaleOrdinal(colorScale);
+function buildLegend(items) {
     items.forEach((item, index) => {
-        const itemPlace = place.append('g')
-          .attr('class', `legend-item-${index}`)
-          .attr('transform', `translate(${widthsArr.reduce((a, b) => a + b)} 0)`);
-
-        new Text(item).render(itemPlace, 'legend-item');
-
-        const width = document.querySelector(`.legend-item-${index}`).getBoundingClientRect().width;
-        widthsArr.push((width + + LEGEND.MARGIN));
+        const h1 = document.querySelector('h1');
+        let comma = index === items.length - 1 ? '.' : ',';
+        const legendItem = document.createElement('span');
+        const text = document.createTextNode((`${item}${comma} `));
+        legendItem.append(text);
+        legendItem.style.color = continentColor(item);
+        h1.append(legendItem);
     })
 }
 
@@ -137,7 +131,7 @@ function drawVizByInterval(data, scalesArr, amountOfTimes) {
     return () => {
         time = (time < amountOfTimes) ? time + 1 : start;
         drawViz(data[time], ...scalesArr)
-        header.text(String(time + initial));
+        year.text(String(time + initial));
     }
 }
 
@@ -152,15 +146,4 @@ function drawViz(data, x, y, area, color) {
         .attr('cy', d => y(d.income))
         .attr('r', d => (Math.sqrt(area(d.population)/Math.PI)))
         .attr('fill', d => color(d.continent));
-}
-
-//Get data margins
-function getRange(dataset, param) {
-    const parameters = new Set();
-    for (let element of dataset) {
-        for (let country of element) {
-            parameters.add(country[param]);
-        }
-    }
-    return Array.from(parameters);
 }

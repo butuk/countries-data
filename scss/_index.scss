@@ -28,7 +28,7 @@ h1 {
     line-height: 1.2;
     font-size: 5vh;
     margin-top: 5vh;
-    margin-bottom: 3vh;
+    margin-bottom: 3vw;
     @media screen and (orientation: portrait) {
         font-size: 5vw;
         margin-top: 5vw;
@@ -46,22 +46,13 @@ svg {
     height: 100%;
 }
 
-.header {
+.year {
     font-size: 10vh;
     @media screen and (orientation: portrait) {
         font-size: 10vw;
     }
     alignment-baseline: hanging;
     text-anchor: end;
-}
-
-.legend-item {
-    alignment-baseline: hanging;
-    text-anchor: start;
-    font-size: 2vh;
-    @media screen and (orientation: portrait) {
-        font-size: 4vw;
-    }
 }
 
 .axis {
