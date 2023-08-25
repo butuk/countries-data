@@ -18,7 +18,7 @@ export class Scale {
       .base(base);
   }
 
-  ordinal(rangeIn, rangeOut) {
+  ordinal(rangeIn, rangeOut = []) {
     return d3.scaleOrdinal()
       .domain(rangeIn)
       .range(rangeOut)

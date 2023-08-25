@@ -48,17 +48,12 @@ table {
   border-spacing: 0;
 }
 
-#content {
-  position: relative;
-  margin-left: auto;
-  margin-right: auto;
-  margin-top: 5vh;
-  width: 90vh;
+.labelY, .labelX, .axis {
+  font-size: 2vh;
 }
 @media screen and (orientation: portrait) {
-  #content {
-    margin-top: 5vw;
-    width: 80vw;
+  .labelY, .labelX, .axis {
+    font-size: 2vw;
   }
 }
 
@@ -66,21 +61,49 @@ body {
   font-family: "Helvetica", sans-serif;
 }
 
-h1 {
-  line-height: 1.2;
-  font-size: 5vh;
+#content {
+  position: relative;
+  left: -7vh;
+  margin-left: auto;
+  margin-right: auto;
   margin-top: 5vh;
+  width: 90vh;
+}
+@media screen and (orientation: portrait) {
+  #content {
+    left: -4vw;
+    margin-top: 5vw;
+    width: 80vw;
+    min-width: 300px;
+  }
+}
+
+.header {
+  line-height: 1.2;
+  margin-top: 1vh;
   margin-bottom: 3vw;
+  margin-left: 2.5vh;
+}
+@media screen and (orientation: portrait) {
+  .header {
+    margin-top: 1vw;
+    margin-bottom: 3vw;
+    margin-left: 2.5vw;
+  }
+}
+
+h1 {
+  font-size: 5vh;
+  margin-bottom: 3vh;
 }
 @media screen and (orientation: portrait) {
   h1 {
     font-size: 5vw;
-    margin-top: 5vw;
     margin-bottom: 3vw;
   }
 }
 
-#container, #legend {
+#container {
   resize: both;
   overflow: visible;
 }
@@ -101,18 +124,14 @@ svg {
   }
 }
 
-.axis {
-  font-size: 2vh;
-}
-@media screen and (orientation: portrait) {
-  .axis {
-    font-size: 4vw;
-  }
+.labelX {
+  text-anchor: end;
+  alignment-baseline: ideographic;
 }
 
 .labelY {
   alignment-baseline: hanging;
-  text-anchor: middle;
+  text-anchor: end;
   transform: rotate(-90deg);
 }
 
