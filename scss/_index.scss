@@ -71,3 +71,9 @@ svg {
     }
 
 }
+
+.labelY {
+    alignment-baseline: hanging;
+    text-anchor: middle;
+    transform: rotate(-90deg);
+}

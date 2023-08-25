@@ -61,9 +61,8 @@ const legend = d3.select('#legend')
   .attr('preserveAspectRatio', 'xMinYMin meet')
 
 //Adding text
-const header = new Text(svg, 'header', initial, (VIZ.MARGIN.LEFT + width), VIZ.MARGIN.TOP);
-const labelY = new Text(svg, 'labelY', 'Life Expectancy', width/2, height/2);
-//labelY.rotate();
+const header = new Text(initial).render(svg, 'header', (VIZ.MARGIN.LEFT + width), VIZ.MARGIN.TOP);
+new Text('Income').render(svg, 'labelY', 50);
 
 //Loading data and draw visualization
 d3.json(dataPath).then(dataset => {
@@ -87,8 +86,8 @@ d3.json(dataPath).then(dataset => {
     const scalesArr = [lifeScale, incomeScale, populationScale, continentScale];
 
     //Draw axis
-    new Axis('right', incomeScale, 3).draw(svg, VIZ.MARGIN.LEFT, VIZ.MARGIN.TOP);
-    new Axis('top', lifeScale, 5).draw(svg, VIZ.MARGIN.LEFT, (VIZ.MARGIN.TOP + height));
+    new Axis(incomeScale).render(svg, VIZ.MARGIN.LEFT, VIZ.MARGIN.TOP, 'right', 3);
+    new Axis(lifeScale).render(svg, VIZ.MARGIN.LEFT, (VIZ.MARGIN.TOP + height), 'top', 5);
 
     //Draw legend
     buildLegend(legend, getRange(data, 'continent'));
@@ -113,7 +112,7 @@ function buildLegend(place, items) {
           .attr('class', `legend-item-${index}`)
           .attr('transform', `translate(${widthsArr.reduce((a, b) => a + b)} 0)`);
 
-        new Text(itemPlace, 'legend-item',`${item}`)
+        new Text(item).render(itemPlace, 'legend-item');
 
         const width = document.querySelector(`.legend-item-${index}`).getBoundingClientRect().width;
         widthsArr.push((width + + LEGEND.MARGIN));

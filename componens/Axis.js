@@ -1,21 +1,27 @@
 import * as d3 from 'https://cdn.jsdelivr.net/npm/d3@7/+esm';
 
 export class Axis {
-  constructor(type, ...args) { // Type is the side where the axis text will be relatively its line
-      this.axisType = 'axis' + type.slice(0,1).toUpperCase() + type.slice(1,type.length);
-      return this.create(...args)
+  constructor(scale) {
+      this.scale = scale;
   }
 
-  create(scale, ticks, x, y) {
-    this.axis = d3[`${this.axisType}`](scale)
+  render(place, x, y, type, ticks) {
+    /*
+    Type is the side where the axis text will
+    be relatively its line.
+    If it will be on the right or left,
+    the line will be vertical.
+    If top or bottom – horizontal.
+    */
+    const axisName = 'axis' + type.slice(0,1).toUpperCase() + type.slice(1,type.length);
+
+    const axis = d3[`${axisName}`](this.scale)
       .tickSize(0)
       .ticks(ticks)
-  }
 
-  draw(place, x, y) {
     return place.append('g')
       .attr('transform', `translate(${x}, ${y})`)
-      .attr('class', `axis ${this.axisType}`)
-      .call(this.axis);
+      .attr('class', `axis ${axisName}`)
+      .call(axis);
   }
 }

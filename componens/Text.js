@@ -1,15 +1,15 @@
 export class Text {
-  constructor(place, txtClass, text, x = 0, y = 0) {
-    this.elem = place.append('text')
-      .attr('class', `${txtClass}`)
-      .attr('x', x)
-      .attr('y', y)
-      .text(text)
-    return this.elem;
+
+  constructor(text) {
+    this.text = text;
   }
 
-  rotate() {
-    console.log(this);
-    //return this.elem.attr('transform', `rotate(${deg})`)
+  render(place, txtClass = null, x = 0, y = 0) {
+    const where = place.append('g')
+      .attr('transform', `translate(${x} ${y})`)
+
+    return where.append('text')
+      .attr('class', `${txtClass}`)
+      .text(this.text)
   }
 }
