@@ -48,7 +48,12 @@ table {
   border-spacing: 0;
 }
 
+:root {
+  --white: #DCD8D9;
+}
+
 .labelY, .labelX, .axis {
+  fill: var(--white);
   font-size: 2vh;
 }
 @media screen and (orientation: portrait) {
@@ -59,6 +64,10 @@ table {
 
 body {
   font-family: "Helvetica", sans-serif;
+  color: var(--white);
+  background: #3b3d3d;
+  background: linear-gradient(0deg, #1b1d1d, #3b3d3d);
+  height: 100vh;
 }
 
 #content {
@@ -114,13 +123,19 @@ svg {
 }
 
 .year {
-  font-size: 10vh;
+  font-family: "Fira Mono", monospace;
+  font-weight: bold;
+  color: #333333;
+  z-index: 100;
+  opacity: 0.2;
+  letter-spacing: -1vh;
+  font-size: 20vh;
   alignment-baseline: hanging;
   text-anchor: end;
 }
 @media screen and (orientation: portrait) {
   .year {
-    font-size: 10vw;
+    font-size: 20vw;
   }
 }
 

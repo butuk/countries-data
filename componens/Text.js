@@ -8,8 +8,10 @@ export class Text {
     const where = place.append('g')
       .attr('transform', `translate(${x} ${y})`)
 
-    return where.append('text')
+    this.block = where.append('text')
       .attr('class', `${txtClass}`)
       .text(this.text)
+
+    return this;
   }
 }

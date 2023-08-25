@@ -19,9 +19,11 @@ export class Axis {
       .tickSize(0)
       .ticks(ticks)
 
-    return place.append('g')
+    this.block = place.append('g')
       .attr('transform', `translate(${x}, ${y})`)
       .attr('class', `axis ${axisName}`)
       .call(axis);
+
+    return this;
   }
 }
