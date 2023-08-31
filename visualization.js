@@ -7,6 +7,7 @@ import {Range} from "./componens/Range.js";
 import {Interval} from "./componens/Interval.js";
 import {Svg} from "./componens/Svg.js";
 import {SvgGroup} from "./componens/SvgGroup.js";
+import {Tip} from "./componens/Tip.js";
 
 //Data source
 const dataPath = 'data.json';
@@ -119,10 +120,17 @@ function renderViz(data, [x, y, area, color]) {
     points.exit().remove();
     points.enter().append('circle')
         .attr('opacity', opacity)
+        .on('mouseover', showTip)
         .merge(points)
             .transition(t)
                 .attr('cx', d => x(d.life_exp))
                 .attr('cy', d => y(d.income))
                 .attr('r', d => (Math.sqrt(area(d.population)/Math.PI)))
                 .attr('fill', d => color(d.continent))
+}
+
+function showTip(event) {
+    const data = event.target['__data__'];
+    const tip = new Tip(data, 'Continent', 'Country');
+    //tip.render(document.querySelector('#container'));
 }
