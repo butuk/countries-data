@@ -35,7 +35,7 @@ const duration = speed - 1; //Animation speed
 
 //Canvas
 const svg = new Svg(VIZ.WIDTH, VIZ.HEIGHT, 'canvas').render('#container')
-const vis = new SvgGroup().render(svg, VIZ.MARGIN.LEFT, VIZ.MARGIN.TOP);
+const vis = new SvgGroup('viz').render(svg, VIZ.MARGIN.LEFT, VIZ.MARGIN.TOP);
 
 //Timer will be controlled by clicking the canvas
 const controller = document.querySelector('.canvas');
@@ -121,6 +121,7 @@ function renderViz(data, [x, y, area, color]) {
     points.enter().append('circle')
         .attr('opacity', opacity)
         .on('mouseover', showTip)
+        .on('mouseout', hideTip)
         .merge(points)
             .transition(t)
                 .attr('cx', d => x(d.life_exp))
@@ -129,8 +130,27 @@ function renderViz(data, [x, y, area, color]) {
                 .attr('fill', d => color(d.continent))
 }
 
+const yr = document.querySelector('.year');
+yr.addEventListener('mouseOver', preventActions);
+yr.addEventListener('click', preventActions);
+yr.addEventListener('change', preventActions);
+
+function preventActions(event) {
+    event.stopPropagation();
+    event.preventDefault();
+}
+
+let tip;
+
 function showTip(event) {
-    const data = event.target['__data__'];
-    const tip = new Tip(data, 'Continent', 'Country');
-    //tip.render(document.querySelector('#container'));
+    const target = event.target;
+    const data = target['__data__'];
+    tip = new Tip(data, 'Continent', 'Country', 'Income', 'Life exp.', 'Population');
+    tip.render('#container');
+    target.classList.add('outlined');
+}
+
+function hideTip(event) {
+    event.target.classList.remove('outlined');
+    tip.delete();
 }

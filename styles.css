@@ -123,10 +123,11 @@ svg {
 }
 
 .year {
+  /* z-index: 1;
+   position: relative;*/
   font-family: "Fira Mono", monospace;
   font-weight: bold;
   fill: var(--white);
-  z-index: 100;
   opacity: 0.075;
   letter-spacing: -1vh;
   font-size: 20vh;
@@ -139,6 +140,10 @@ svg {
   }
 }
 
+/*.viz {
+    position: relative;
+    z-index: 1000;
+}*/
 .labelX {
   text-anchor: end;
   alignment-baseline: ideographic;
@@ -157,6 +162,16 @@ a {
   text-decoration: underline;
   color: var(--white);
   opacity: 0.5;
+}
+
+.tooltip {
+  position: absolute;
+  left: 0;
+  top: 0;
+}
+
+.outlined {
+  stroke: var(--white);
 }
 
 /*# sourceMappingURL=styles.css.map */
