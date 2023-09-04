@@ -45,6 +45,11 @@ const year = new Text(initial + start, 'year').render(svg, (VIZ.MARGIN.LEFT + wi
 new Text('GDP per capita, $', 'labelY').render(svg, 0, 0);
 new Text('Life expectancy, years', 'labelX').render(svg, (VIZ.MARGIN.LEFT + width), ((VIZ.MARGIN.TOP + height + VIZ.MARGIN.BOTTOM)));
 
+const temp = document.querySelector('#container');
+temp.disabled = true;
+console.log(temp);
+
+
 //Loading data and render visualization
 d3.json(dataPath).then(dataset => {
 
@@ -108,6 +113,7 @@ function renderVizByInterval(data, scalesArr, amountOfTimes) {
         time = (time < amountOfTimes - 1) ? time + 1 : start;
         renderViz(data[time], scalesArr)
         year.text(String(time + initial));
+
     }
 }
 
@@ -128,16 +134,6 @@ function renderViz(data, [x, y, area, color]) {
                 .attr('cy', d => y(d.income))
                 .attr('r', d => (Math.sqrt(area(d.population)/Math.PI)))
                 .attr('fill', d => color(d.continent))
-}
-
-const yr = document.querySelector('.year');
-yr.addEventListener('mouseOver', preventActions);
-yr.addEventListener('click', preventActions);
-yr.addEventListener('change', preventActions);
-
-function preventActions(event) {
-    event.stopPropagation();
-    event.preventDefault();
 }
 
 let tip;
