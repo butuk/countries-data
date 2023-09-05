@@ -10,7 +10,7 @@ export class Text {
       .attr('transform', `translate(${x} ${y})`);
 
     this.block = where.append('text')
-      .attr('class', `${this.txtClass}`)
+      .attr('class', `${this.txtClass} text`)
       .text(this.text)
 
     return this.block;

@@ -122,11 +122,15 @@ svg {
   height: 100%;
 }
 
+.axis {
+  user-select: none;
+}
+
 .year {
   font-family: "Fira Mono", monospace;
   font-weight: bold;
   fill: var(--white);
-  opacity: 0.075;
+  opacity: 0.125;
   letter-spacing: -1vh;
   font-size: 20vh;
   alignment-baseline: hanging;
@@ -136,6 +140,10 @@ svg {
   .year {
     font-size: 20vw;
   }
+}
+
+.text {
+  user-select: none;
 }
 
 .labelX {
@@ -160,8 +168,6 @@ a {
 
 .tooltip {
   position: absolute;
-  left: 0;
-  top: 0;
 }
 
 .outlined {

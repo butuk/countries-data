@@ -37,18 +37,13 @@ const duration = speed - 1; //Animation speed
 const svg = new Svg(VIZ.WIDTH, VIZ.HEIGHT, 'canvas').render('#container')
 const vis = new SvgGroup('viz').render(svg, VIZ.MARGIN.LEFT, VIZ.MARGIN.TOP);
 
-//Timer will be controlled by clicking the canvas
-const controller = document.querySelector('.canvas');
-
 //Adding text
-const year = new Text(initial + start, 'year').render(svg, (VIZ.MARGIN.LEFT + width), VIZ.MARGIN.TOP);
 new Text('GDP per capita, $', 'labelY').render(svg, 0, 0);
 new Text('Life expectancy, years', 'labelX').render(svg, (VIZ.MARGIN.LEFT + width), ((VIZ.MARGIN.TOP + height + VIZ.MARGIN.BOTTOM)));
+const year = new Text(initial + start, 'year').render(vis, width, 0);
 
-const temp = document.querySelector('#container');
-temp.disabled = true;
-console.log(temp);
-
+//Timer will be controlled by clicking the canvas
+const controller = document.querySelector('.canvas');
 
 //Loading data and render visualization
 d3.json(dataPath).then(dataset => {
@@ -95,7 +90,7 @@ d3.json(dataPath).then(dataset => {
 function buildLegend(items, colors) {
     const continentColor = new Scale('ordinal', [], colors);
     items.forEach((item, index) => {
-        item = item.slice(0,1).toUpperCase() + item.slice(1,item.length);
+        item = firstLetterBig(item);
         const h1 = document.querySelector('h1');
         const comma = (index !== items.length - 2 && index !== items.length - 1) ? ',' : '';
         const and = index === items.length - 1 ? ' and ' : '';
@@ -113,7 +108,6 @@ function renderVizByInterval(data, scalesArr, amountOfTimes) {
         time = (time < amountOfTimes - 1) ? time + 1 : start;
         renderViz(data[time], scalesArr)
         year.text(String(time + initial));
-
     }
 }
 
@@ -134,19 +128,26 @@ function renderViz(data, [x, y, area, color]) {
                 .attr('cy', d => y(d.income))
                 .attr('r', d => (Math.sqrt(area(d.population)/Math.PI)))
                 .attr('fill', d => color(d.continent))
+
 }
 
+//Tooltip showed on mouse hover
 let tip;
 
 function showTip(event) {
     const target = event.target;
     const data = target['__data__'];
-    tip = new Tip(data, 'Continent', 'Country', 'Income', 'Life exp.', 'Population');
-    tip.render('#container');
+    tip = new Tip(data,['Continent', 'Country', 'GDP per capita', 'Life Expectancy', 'Population'], [firstLetterBig]);
+    tip.render('#content', `${event.clientX}px`, `${event.clientY}px`);
     target.classList.add('outlined');
 }
 
 function hideTip(event) {
     event.target.classList.remove('outlined');
     tip.delete();
+}
+
+//Formatting text and data
+function firstLetterBig(item) {
+    return item.charAt(0).toUpperCase() + item.slice(1);
 }
