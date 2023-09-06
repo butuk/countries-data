@@ -50,14 +50,15 @@ table {
 
 :root {
   --white: #DCD8D9;
+  --black: #3b3d3d;
 }
 
-a, .disclaimer, .labelY, .labelX, .axis {
+.tooltip, a, .disclaimer, .labelY, .labelX, .axis {
   fill: var(--white);
   font-size: 2vh;
 }
 @media screen and (orientation: portrait) {
-  a, .disclaimer, .labelY, .labelX, .axis {
+  .tooltip, a, .disclaimer, .labelY, .labelX, .axis {
     font-size: 2vw;
   }
 }
@@ -65,7 +66,7 @@ a, .disclaimer, .labelY, .labelX, .axis {
 body {
   font-family: "Helvetica", sans-serif;
   color: var(--white);
-  background: #3b3d3d;
+  background: var(--black);
   background: linear-gradient(0deg, #0b0d0d, #1b1d1d);
   height: 90vh;
 }
@@ -115,6 +116,8 @@ h1 {
 #container {
   resize: both;
   overflow: visible;
+  position: relative;
+  z-index: 1;
 }
 
 svg {
@@ -167,7 +170,14 @@ a {
 }
 
 .tooltip {
+  border-radius: 3px;
+  line-height: 1.5em;
+  padding: 1em 2em 1.5em 1em;
+  background-color: rgba(255, 255, 255, 0.7);
+  backdrop-filter: blur(10px);
+  color: var(--black);
   position: absolute;
+  z-index: 100;
 }
 
 .outlined {

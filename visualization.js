@@ -8,6 +8,7 @@ import {Interval} from "./componens/Interval.js";
 import {Svg} from "./componens/Svg.js";
 import {SvgGroup} from "./componens/SvgGroup.js";
 import {Tip} from "./componens/Tip.js";
+import {format} from "./componens/format.js";
 
 //Data source
 const dataPath = 'data.json';
@@ -90,7 +91,7 @@ d3.json(dataPath).then(dataset => {
 function buildLegend(items, colors) {
     const continentColor = new Scale('ordinal', [], colors);
     items.forEach((item, index) => {
-        item = firstLetterBig(item);
+        item = format.firstLetterBig(item);
         const h1 = document.querySelector('h1');
         const comma = (index !== items.length - 2 && index !== items.length - 1) ? ',' : '';
         const and = index === items.length - 1 ? ' and ' : '';
@@ -131,14 +132,14 @@ function renderViz(data, [x, y, area, color]) {
 
 }
 
-//Tooltip showed on mouse hover
+//Show tooltip on mouse hover
 let tip;
 
 function showTip(event) {
     const target = event.target;
     const data = target['__data__'];
-    tip = new Tip(data,['Continent', 'Country', 'GDP per capita', 'Life Expectancy', 'Population'], [firstLetterBig]);
-    tip.render('#content', `${event.clientX}px`, `${event.clientY}px`);
+    tip = new Tip(data,['Continent', 'Country', 'GDP per capita', 'Life Expectancy', 'Population'], [format.firstLetterBig, null, format.moneyTalk, format.yearsRound, format.populationNumber]);
+    tip.render(document.body, `${event.clientX}px`, `${event.clientY}px`);
     target.classList.add('outlined');
 }
 
@@ -147,7 +148,3 @@ function hideTip(event) {
     tip.delete();
 }
 
-//Formatting text and data
-function firstLetterBig(item) {
-    return item.charAt(0).toUpperCase() + item.slice(1);
-}

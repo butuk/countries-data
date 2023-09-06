@@ -6,6 +6,7 @@ export class Tip {
     for (let index = 0; index < this.keys.length; index++) {
       let parameter = this.keys[index];
       names[index] ? parameter = names[index] : parameter;
+
       let value = this.data[index];
       funcs[index] ? value = funcs[index](value) : value;
       this.text += parameter + ': ' + value + '\n';
@@ -16,7 +17,7 @@ export class Tip {
     const div = document.createElement('div');
     div.classList.add('tooltip');
     div.innerText = this.text;
-    document.querySelector(place).append(div);
+    place.append(div);
     div.style.left = x;
     div.style.top = y;
   }
