@@ -184,4 +184,9 @@ a {
   stroke: var(--white);
 }
 
+.legend-item {
+  text-decoration: underline;
+  cursor: pointer;
+}
+
 /*# sourceMappingURL=styles.css.map */

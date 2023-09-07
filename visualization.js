@@ -8,6 +8,7 @@ import {Interval} from "./componens/Interval.js";
 import {Svg} from "./componens/Svg.js";
 import {SvgGroup} from "./componens/SvgGroup.js";
 import {Tip} from "./componens/Tip.js";
+import {LegendItem} from "./componens/LegendItem.js";
 import {format} from "./componens/format.js";
 
 //Data source
@@ -87,20 +88,28 @@ d3.json(dataPath).then(dataset => {
     console.log(error);
 });
 
-//Building legend
+//Building legend and make it to be a filter also
 function buildLegend(items, colors) {
     const continentColor = new Scale('ordinal', [], colors);
     items.forEach((item, index) => {
         item = format.firstLetterBig(item);
         const h1 = document.querySelector('h1');
+        const legendItem = new LegendItem(item, index, continentColor).render();
+
         const comma = (index !== items.length - 2 && index !== items.length - 1) ? ',' : '';
         const and = index === items.length - 1 ? ' and ' : '';
-        const legendItem = document.createElement('span');
         const text = document.createTextNode((`${and}${item}${comma} `));
+
         legendItem.append(text);
-        legendItem.style.color = continentColor(item);
         h1.append(legendItem);
+
+        legendItem.addEventListener('click', filterData);
     })
+}
+
+//Filter data
+function filterData(event) {
+    console.log(event.target.dataset.num);
 }
 
 //Rendering visualization by interval
