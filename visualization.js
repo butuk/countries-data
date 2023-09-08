@@ -30,7 +30,7 @@ const colorScale = d3.schemeAccent;     //Color range. Source: https://github.co
 
 //Time and timer variables
 const initial = 1800;
-const start = 100;
+const start = 0;
 let time = start;
 const speed = 100; //Time speed. In milliseconds
 const duration = speed - 1; //Animation speed
@@ -46,6 +46,10 @@ const year = new Text(initial + start, 'year').render(vis, width, 0);
 
 //Timer will be controlled by clicking the canvas
 const controller = document.querySelector('.canvas');
+
+let tip;
+let filtered = false;
+let filteredBy = '';
 
 //Loading data and render visualization
 d3.json(dataPath).then(dataset => {
@@ -76,7 +80,7 @@ d3.json(dataPath).then(dataset => {
     new Axis(lifeScale).render(svg, VIZ.MARGIN.LEFT, (VIZ.MARGIN.TOP + height), 'top', ticksX);
 
     //Build legend
-    buildLegend(range.get('continent'), colorScale);
+    buildLegendFilter(data, range.get('continent'), colorScale);
 
     //Change visualization by interval
     new Interval(renderVizByInterval(data, scalesArr, data.length)).run(speed).control(controller);
@@ -89,27 +93,27 @@ d3.json(dataPath).then(dataset => {
 });
 
 //Building legend and make it to be a filter also
-function buildLegend(items, colors) {
+function buildLegendFilter(data, items, colors) {
     const continentColor = new Scale('ordinal', [], colors);
     items.forEach((item, index) => {
-        item = format.firstLetterBig(item);
         const h1 = document.querySelector('h1');
-        const legendItem = new LegendItem(item, index, continentColor).render();
+        const legendItem = new LegendItem(item, index).render(continentColor);
+        legendItem.dataset.item = `${item}`;
 
+        const v = index === 0 ? 'in ' : '';
         const comma = (index !== items.length - 2 && index !== items.length - 1) ? ',' : '';
-        const and = index === items.length - 1 ? ' and ' : '';
-        const text = document.createTextNode((`${and}${item}${comma} `));
+        const and = index === items.length - 1 ? 'and ' : '';
+        const text = document.createTextNode((`${v}${and}${item}${comma}`));
 
         legendItem.append(text);
         h1.append(legendItem);
+        h1.append(' ');
 
-        legendItem.addEventListener('click', filterData);
+        legendItem.addEventListener('click', (event) => {
+            filteredBy = item;
+            return filtered = true;
+        })
     })
-}
-
-//Filter data
-function filterData(event) {
-    console.log(event.target.dataset.num);
 }
 
 //Rendering visualization by interval
@@ -125,8 +129,10 @@ function renderVizByInterval(data, scalesArr, amountOfTimes) {
 function renderViz(data, [x, y, area, color]) {
     const t = d3.transition().duration(duration);
 
+    const readyData = filtered ? filterData(data, filteredBy) : data;
+
     const points = vis.selectAll('circle')
-      .data(data, d => d.country); // d => d.country
+      .data(readyData, d => d.country); // d => d.country
     points.exit().remove();
     points.enter().append('circle')
         .attr('opacity', opacity)
@@ -142,8 +148,6 @@ function renderViz(data, [x, y, area, color]) {
 }
 
 //Show tooltip on mouse hover
-let tip;
-
 function showTip(event) {
     const target = event.target;
     const data = target['__data__'];
@@ -157,3 +161,9 @@ function hideTip(event) {
     tip.delete();
 }
 
+//Filter data
+function filterData(data, continent) {
+    return data.filter(country => {
+            return country.continent === continent;
+        })
+}

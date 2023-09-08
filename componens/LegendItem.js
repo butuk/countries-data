@@ -1,15 +1,13 @@
 export class LegendItem {
-  constructor(item, index, scale) {
+  constructor(item, index) {
     this.item = item;
     this.index = index;
-    this.scale = scale;
   }
 
-  render() {
+  render(scale) {
     const legendItem = document.createElement('span');
     legendItem.classList.add(`legend-item`);
-    legendItem.dataset.num = `${this.index}`;
-    legendItem.style.color = this.scale(this.item);
+    legendItem.style.color = scale(this.item);
     return legendItem;
   }
 
