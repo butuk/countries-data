@@ -189,4 +189,9 @@ a {
   cursor: pointer;
 }
 
+.selected {
+  text-decoration: none;
+  cursor: auto;
+}
+
 /*# sourceMappingURL=styles.css.map */

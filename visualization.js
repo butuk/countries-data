@@ -39,6 +39,8 @@ const duration = speed - 1; //Animation speed
 const svg = new Svg(VIZ.WIDTH, VIZ.HEIGHT, 'canvas').render('#container')
 const vis = new SvgGroup('viz').render(svg, VIZ.MARGIN.LEFT, VIZ.MARGIN.TOP);
 
+const h1 = document.querySelector('h1');
+
 //Adding text
 new Text('GDP per capita, $', 'labelY').render(svg, 0, 0);
 new Text('Life expectancy, years', 'labelX').render(svg, (VIZ.MARGIN.LEFT + width), ((VIZ.MARGIN.TOP + height + VIZ.MARGIN.BOTTOM)));
@@ -96,23 +98,18 @@ d3.json(dataPath).then(dataset => {
 function buildLegendFilter(data, items, colors) {
     const continentColor = new Scale('ordinal', [], colors);
     items.forEach((item, index) => {
-        const h1 = document.querySelector('h1');
         const legendItem = new LegendItem(item, index).render(continentColor);
         legendItem.dataset.item = `${item}`;
 
         const v = index === 0 ? 'in ' : '';
-        const comma = (index !== items.length - 2 && index !== items.length - 1) ? ',' : '';
-        const and = index === items.length - 1 ? 'and ' : '';
-        const text = document.createTextNode((`${v}${and}${item}${comma}`));
+        const comma = (index !== items.length - 1) ? ',' : '';
+        const text = document.createTextNode((`${v}${item}${comma}`));
 
         legendItem.append(text);
         h1.append(legendItem);
-        h1.append(' ');
+        index < items.length - 1 ? h1.append(' ') : null;
 
-        legendItem.addEventListener('click', (event) => {
-            filteredBy = item;
-            return filtered = true;
-        })
+        legendItem.addEventListener('click', onFilterClick);
     })
 }
 
@@ -161,9 +158,45 @@ function hideTip(event) {
     tip.delete();
 }
 
+function onFilterClick(event) {
+    filteredBy = event.target.dataset.item;
+    event.target.classList.add('selected');
+    showResetFilterButton();
+    return filtered = true;
+}
+
+function showResetFilterButton() {
+    const all = document.createElement('span');
+    all.classList.add('filter-reset');
+    all.classList.add('legend-item')
+
+    const divider = document.createElement('span');
+    divider.classList.add('filter-reset');
+
+    divider.textContent = ', ';
+    all.textContent = 'all countries';
+
+    if (!filtered) {
+        h1.append(divider);
+        h1.append(all);
+    }
+    all.addEventListener('click', resetFilter);
+}
+
+function resetFilter() {
+    document.querySelectorAll('.filter-reset').forEach(item => {
+        item.remove();
+    })
+    document.querySelectorAll('.legend-item').forEach(item => {
+        item.classList.remove('selected');
+    })
+    return filtered = false;
+}
+
 //Filter data
 function filterData(data, continent) {
     return data.filter(country => {
             return country.continent === continent;
         })
 }
+
