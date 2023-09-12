@@ -109,7 +109,7 @@ function buildLegendFilter(data, items, colors) {
         h1.append(legendItem);
         index < items.length - 1 ? h1.append(' ') : null;
 
-        legendItem.addEventListener('click', onFilterClick);
+        //legendItem.addEventListener('click', applyFilter);
     })
 }
 
@@ -126,7 +126,8 @@ function renderVizByInterval(data, scalesArr, amountOfTimes) {
 function renderViz(data, [x, y, area, color]) {
     const t = d3.transition().duration(duration);
 
-    const readyData = filtered ? filterData(data, filteredBy) : data;
+    const readyData = data;
+    //filtered ? filterData(data, filteredBy) : data;
 
     const points = vis.selectAll('circle')
       .data(readyData, d => d.country); // d => d.country
@@ -158,17 +159,26 @@ function hideTip(event) {
     tip.delete();
 }
 
-function onFilterClick(event) {
-    filteredBy = event.target.dataset.item;
-    event.target.classList.add('selected');
+/*//Filter related events
+function applyFilter(event) {
+    const parameter = event.target;
+    filteredBy = parameter.dataset.item;
     showResetFilterButton();
+    dimOtherButtons(parameter, '.legend-item', '.filter-reset');
+    parameter.classList.add('selected');
     return filtered = true;
+}
+
+function resetFilter() {
+    upLightButtons('.legend-item');
+    hideFilterButton();
+    return filtered = false;
 }
 
 function showResetFilterButton() {
     const all = document.createElement('span');
     all.classList.add('filter-reset');
-    all.classList.add('legend-item')
+    all.classList.add('legend-item');
 
     const divider = document.createElement('span');
     divider.classList.add('filter-reset');
@@ -183,14 +193,28 @@ function showResetFilterButton() {
     all.addEventListener('click', resetFilter);
 }
 
-function resetFilter() {
+function hideFilterButton() {
     document.querySelectorAll('.filter-reset').forEach(item => {
         item.remove();
     })
+}
+
+function dimOtherButtons(button, ...className) {
+    button.classList.remove('dimmed');
+    button.classList.add('selected');
+    className.forEach(name => {
+        document.querySelectorAll(name).forEach(item => {
+            item.classList.remove('selected');
+            item !== button ? item.classList.add('dimmed') : null;
+        });
+    });
+}
+
+function upLightButtons(className) {
     document.querySelectorAll('.legend-item').forEach(item => {
+        item.classList.remove('dimmed');
         item.classList.remove('selected');
     })
-    return filtered = false;
 }
 
 //Filter data
@@ -198,5 +222,5 @@ function filterData(data, continent) {
     return data.filter(country => {
             return country.continent === continent;
         })
-}
+}*/
 

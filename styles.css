@@ -184,7 +184,7 @@ a {
   stroke: var(--white);
 }
 
-.legend-item {
+.filter-item {
   text-decoration: underline;
   cursor: pointer;
 }
@@ -192,6 +192,10 @@ a {
 .selected {
   text-decoration: none;
   cursor: auto;
+}
+
+.dimmed {
+  opacity: 0.3;
 }
 
 /*# sourceMappingURL=styles.css.map */
