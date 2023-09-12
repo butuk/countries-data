@@ -1,70 +1,79 @@
 export class Filter  {
-  constructor(props) {
-    this
+  constructor(data, parameter, filtered) {
+    this.data = data;
+    this.parameter = parameter;
+    this.filtered = filtered;
   }
 
-
-  function applyFilter(event) {
-  const parameter = event.target;
-  filteredBy = parameter.dataset.item;
-  showResetFilterButton();
-  dimOtherButtons(parameter, '.filter-item', '.filter-reset');
-  parameter.classList.add('selected');
-  return filtered = true;
-}
-
-function resetFilter() {
-  upLightButtons('.filter-item');
-  hideFilterButton();
-  return filtered = false;
-}
-
-function showResetFilterButton() {
-  const all = document.createElement('span');
-  all.classList.add('filter-reset');
-  all.classList.add('filter-item');
-
-  const divider = document.createElement('span');
-  divider.classList.add('filter-reset');
-
-  divider.textContent = ', ';
-  all.textContent = 'all countries';
-
-  if (!filtered) {
-    h1.append(divider);
-    h1.append(all);
+  render(place, elements) {
+    document.querySelectorAll(elements).forEach(item => {
+      item.classList.add('filter-item');
+      item.addEventListener('click', this.apply);
+    })
+    this.place = place;
+    return this;
   }
-  all.addEventListener('click', resetFilter);
-}
 
-function hideFilterButton() {
-  document.querySelectorAll('.filter-reset').forEach(item => {
-    item.remove();
-  })
-}
+  apply(event) {
+    const parameter = event.target;
+    this.filteredBy = parameter.dataset.item;
+    this.showResetButton();
+    //this.dimOtherButtons(parameter, '.filter-item', '.filter-reset');
+    parameter.classList.add('selected');
+    this.filtered = true;
+  }
 
-function dimOtherButtons(button, ...className) {
-  button.classList.remove('dimmed');
-  button.classList.add('selected');
-  className.forEach(name => {
-    document.querySelectorAll(name).forEach(item => {
-      item.classList.remove('selected');
-      item !== button ? item.classList.add('dimmed') : null;
+  reset() {
+    this.upLightButtons('.filter-item');
+    this.hideButton();
+    this.filtered = false;
+  }
+
+  showResetButton() {
+    const all = document.createElement('span');
+    all.classList.add('filter-reset');
+    all.classList.add('filter-item');
+
+    const divider = document.createElement('span');
+    divider.classList.add('filter-reset');
+
+    divider.textContent = ', ';
+    all.textContent = 'all countries';
+
+    if (!this.filtered) {
+      this.place.append(divider);
+      this.place.append(all);
+    }
+    all.addEventListener('click', this.reset);
+  }
+
+  hideButton() {
+    document.querySelectorAll('.filter-reset').forEach(item => {
+      item.remove();
+    })
+  }
+
+  dimOtherButtons(button, ...className) {
+    button.classList.remove('dimmed');
+    button.classList.add('selected');
+    className.forEach(name => {
+      document.querySelectorAll(name).forEach(item => {
+        item.classList.remove('selected');
+        item !== button ? item.classList.add('dimmed') : null;
+      });
     });
-  });
-}
+  }
 
-function upLightButtons(className) {
-  document.querySelectorAll('.filter-item').forEach(item => {
-    item.classList.remove('dimmed');
-    item.classList.remove('selected');
-  })
-}
+  upLightButtons(className) {
+    document.querySelectorAll('.filter-item').forEach(item => {
+      item.classList.remove('dimmed');
+      item.classList.remove('selected');
+    })
+  }
 
-//Filter data
-function filterData(data, continent) {
-  return data.filter(country => {
-    return country.continent === continent;
+  filterData() {
+  this.data.filter(country => {
+    return country[this.parameter] === this.parameter;
   })
 }
 }

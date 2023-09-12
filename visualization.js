@@ -10,6 +10,7 @@ import {SvgGroup} from "./componens/SvgGroup.js";
 import {Tip} from "./componens/Tip.js";
 import {LegendItem} from "./componens/LegendItem.js";
 import {format} from "./componens/format.js";
+import {Filter} from "./componens/Filter.js";
 
 //Data source
 const dataPath = 'data.json';
@@ -50,8 +51,7 @@ const year = new Text(initial + start, 'year').render(vis, width, 0);
 const controller = document.querySelector('.canvas');
 
 let tip;
-let filtered = false;
-let filteredBy = '';
+const filteredBy = '';
 
 //Loading data and render visualization
 d3.json(dataPath).then(dataset => {
@@ -82,7 +82,10 @@ d3.json(dataPath).then(dataset => {
     new Axis(lifeScale).render(svg, VIZ.MARGIN.LEFT, (VIZ.MARGIN.TOP + height), 'top', ticksX);
 
     //Build legend
-    buildLegendFilter(data, range.get('continent'), colorScale);
+    buildLegend(data, range.get('continent'), colorScale);
+
+    const filter = new Filter(data, continent, false);
+    filter.render(h1, '.legend-item');
 
     //Change visualization by interval
     new Interval(renderVizByInterval(data, scalesArr, data.length)).run(speed).control(controller);
@@ -95,7 +98,7 @@ d3.json(dataPath).then(dataset => {
 });
 
 //Building legend and make it to be a filter also
-function buildLegendFilter(data, items, colors) {
+function buildLegend(data, items, colors) {
     const continentColor = new Scale('ordinal', [], colors);
     items.forEach((item, index) => {
         const legendItem = new LegendItem(item, index).render(continentColor);
@@ -158,6 +161,7 @@ function hideTip(event) {
     event.target.classList.remove('outlined');
     tip.delete();
 }
+
 
 /*//Filter related events
 function applyFilter(event) {
