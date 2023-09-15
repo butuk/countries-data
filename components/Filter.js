@@ -57,7 +57,6 @@ export class Filter  {
 
   dimOtherButtons(button, ...className) {
     button.classList.remove('dimmed');
-    button.classList.add('selected');
     className.forEach(name => {
       document.querySelectorAll(name).forEach(item => {
         item.classList.remove('selected');

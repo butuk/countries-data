@@ -1,16 +1,16 @@
 'use strict';
 import * as d3 from 'https://cdn.jsdelivr.net/npm/d3@7/+esm';
-import {Scale} from './componens/Scale.js';
-import {Axis} from "./componens/Axis.js";
-import {Text} from "./componens/Text.js";
-import {Range} from "./componens/Range.js";
-import {Interval} from "./componens/Interval.js";
-import {Svg} from "./componens/Svg.js";
-import {SvgGroup} from "./componens/SvgGroup.js";
-import {Tip} from "./componens/Tip.js";
-import {LegendItem} from "./componens/LegendItem.js";
-import {format} from "./componens/format.js";
-import {Filter} from "./componens/Filter.js";
+import {Scale} from './components/Scale.js';
+import {Axis} from "./components/Axis.js";
+import {Text} from "./components/Text.js";
+import {Range} from "./components/Range.js";
+import {Interval} from "./components/Interval.js";
+import {Svg} from "./components/Svg.js";
+import {SvgGroup} from "./components/SvgGroup.js";
+import {Tip} from "./components/Tip.js";
+import {format} from "./components/format.js";
+import {Filter} from "./components/Filter.js";
+import {Legend} from "./components/Legend.js";
 
 //Data source
 const dataPath = 'data.json';
@@ -81,7 +81,7 @@ d3.json(dataPath).then(dataset => {
     new Axis(lifeScale).render(svg, VIZ.MARGIN.LEFT, (VIZ.MARGIN.TOP + height), 'top', ticksX);
 
     //Build legend
-    buildLegend(data, range.get('continent'), colorScale);
+    new Legend(range.get('continent'), colorScale).render(h1);
 
     //Make legend to be a filter also
     const filter = new Filter('continent', false).render(h1, '.legend-item');
@@ -95,23 +95,18 @@ d3.json(dataPath).then(dataset => {
 }).catch(error => {
     console.log(error);
 });
+//Show tooltip on mouse hover
+function showTip(event) {
+    const target = event.target;
+    const data = target['__data__'];
+    tip = new Tip(data,['Continent', 'Country', 'GDP per capita', 'Life Expectancy', 'Population'], [format.firstLetterBig, null, format.moneyTalk, format.yearsRound, format.populationNumber]);
+    tip.render(document.body, `${event.clientX}px`, `${event.clientY}px`);
+    target.classList.add('outlined');
+}
 
-//Building legend and make it to be a filter also
-function buildLegend(data, items, colors) {
-    const continentColor = new Scale('ordinal', [], colors);
-    items.forEach((item, index) => {
-        const legendItem = new LegendItem(item, index).render(continentColor);
-        legendItem.dataset.item = `${item}`;
-        const itemFormated = format.firstLetterBig(item);
-
-        const v = index === 0 ? 'in ' : '';
-        const comma = (index !== items.length - 1) ? ',' : '';
-        const text = document.createTextNode((`${v}${itemFormated}${comma}`));
-
-        legendItem.append(text);
-        h1.append(legendItem);
-        index < items.length - 1 ? h1.append(' ') : null;
-    })
+function hideTip(event) {
+    event.target.classList.remove('outlined');
+    tip.delete();
 }
 
 //Rendering visualization by interval
@@ -127,7 +122,7 @@ function renderVizByInterval(amountOfTimes, data, scalesArr, filter) {
 function renderViz(data, [x, y, area, color], filter) {
     const t = d3.transition().duration(duration);
 
-    const readyData = filter.applied === true ? filter.filterData(data) : data;
+    const readyData = filter && filter.applied === true ? filter.filterData(data) : data;
 
     const points = vis.selectAll('circle')
       .data(readyData, d => d.country); // d => d.country
@@ -145,17 +140,5 @@ function renderViz(data, [x, y, area, color], filter) {
 
 }
 
-//Show tooltip on mouse hover
-function showTip(event) {
-    const target = event.target;
-    const data = target['__data__'];
-    tip = new Tip(data,['Continent', 'Country', 'GDP per capita', 'Life Expectancy', 'Population'], [format.firstLetterBig, null, format.moneyTalk, format.yearsRound, format.populationNumber]);
-    tip.render(document.body, `${event.clientX}px`, `${event.clientY}px`);
-    target.classList.add('outlined');
-}
 
-function hideTip(event) {
-    event.target.classList.remove('outlined');
-    tip.delete();
-}
 
