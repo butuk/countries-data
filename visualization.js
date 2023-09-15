@@ -51,7 +51,7 @@ const year = new Text(initial + start, 'year').render(vis, width, 0);
 const controller = document.querySelector('.canvas');
 
 let tip;
-const filteredBy = '';
+const filteredBy = 'continent';
 
 //Loading data and render visualization
 d3.json(dataPath).then(dataset => {
@@ -84,14 +84,14 @@ d3.json(dataPath).then(dataset => {
     //Build legend
     buildLegend(data, range.get('continent'), colorScale);
 
-    const filter = new Filter(data, continent, false);
-    filter.render(h1, '.legend-item');
+    //Make legend to be a filter also
+    const filter = new Filter(filteredBy, 'false').render(h1, '.legend-item');
 
     //Change visualization by interval
-    new Interval(renderVizByInterval(data, scalesArr, data.length)).run(speed).control(controller);
+    new Interval(renderVizByInterval(data.length, data, scalesArr, filter)).run(speed).control(controller);
 
     //Render viz for the first time
-    renderViz(data[start], scalesArr);
+    renderViz(data[start], scalesArr, filter);
 
 }).catch(error => {
     console.log(error);
@@ -111,26 +111,23 @@ function buildLegend(data, items, colors) {
         legendItem.append(text);
         h1.append(legendItem);
         index < items.length - 1 ? h1.append(' ') : null;
-
-        //legendItem.addEventListener('click', applyFilter);
     })
 }
 
 //Rendering visualization by interval
-function renderVizByInterval(data, scalesArr, amountOfTimes) {
+function renderVizByInterval(amountOfTimes, data, scalesArr, filter) {
     return () => {
         time = (time < amountOfTimes - 1) ? time + 1 : start;
-        renderViz(data[time], scalesArr)
+        renderViz(data[time], scalesArr, filter)
         year.text(String(time + initial));
     }
 }
 
 //Rendering visualization
-function renderViz(data, [x, y, area, color]) {
+function renderViz(data, [x, y, area, color], filter) {
     const t = d3.transition().duration(duration);
 
-    const readyData = data;
-    //filtered ? filterData(data, filteredBy) : data;
+    const readyData = filter.applied === true ? filter.filterData(data) : data;
 
     const points = vis.selectAll('circle')
       .data(readyData, d => d.country); // d => d.country
@@ -161,70 +158,4 @@ function hideTip(event) {
     event.target.classList.remove('outlined');
     tip.delete();
 }
-
-
-/*//Filter related events
-function applyFilter(event) {
-    const parameter = event.target;
-    filteredBy = parameter.dataset.item;
-    showResetFilterButton();
-    dimOtherButtons(parameter, '.legend-item', '.filter-reset');
-    parameter.classList.add('selected');
-    return filtered = true;
-}
-
-function resetFilter() {
-    upLightButtons('.legend-item');
-    hideFilterButton();
-    return filtered = false;
-}
-
-function showResetFilterButton() {
-    const all = document.createElement('span');
-    all.classList.add('filter-reset');
-    all.classList.add('legend-item');
-
-    const divider = document.createElement('span');
-    divider.classList.add('filter-reset');
-
-    divider.textContent = ', ';
-    all.textContent = 'all countries';
-
-    if (!filtered) {
-        h1.append(divider);
-        h1.append(all);
-    }
-    all.addEventListener('click', resetFilter);
-}
-
-function hideFilterButton() {
-    document.querySelectorAll('.filter-reset').forEach(item => {
-        item.remove();
-    })
-}
-
-function dimOtherButtons(button, ...className) {
-    button.classList.remove('dimmed');
-    button.classList.add('selected');
-    className.forEach(name => {
-        document.querySelectorAll(name).forEach(item => {
-            item.classList.remove('selected');
-            item !== button ? item.classList.add('dimmed') : null;
-        });
-    });
-}
-
-function upLightButtons(className) {
-    document.querySelectorAll('.legend-item').forEach(item => {
-        item.classList.remove('dimmed');
-        item.classList.remove('selected');
-    })
-}
-
-//Filter data
-function filterData(data, continent) {
-    return data.filter(country => {
-            return country.continent === continent;
-        })
-}*/
 

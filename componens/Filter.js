@@ -1,32 +1,31 @@
 export class Filter  {
-  constructor(data, parameter, filtered) {
-    this.data = data;
+  constructor(parameter, applied) {
     this.parameter = parameter;
-    this.filtered = filtered;
+    this.applied = applied;
   }
 
   render(place, elements) {
-    document.querySelectorAll(elements).forEach(item => {
-      item.classList.add('filter-item');
-      item.addEventListener('click', this.apply);
-    })
     this.place = place;
+    document.querySelectorAll(elements).forEach(button => {
+      button.classList.add('filter-item');
+      button.addEventListener('click', this.apply.bind(this));
+    })
     return this;
   }
 
   apply(event) {
-    const parameter = event.target;
-    this.filteredBy = parameter.dataset.item;
+    const eventTarget = event.target;
+    this.filteredBy = eventTarget.dataset.item;
     this.showResetButton();
-    //this.dimOtherButtons(parameter, '.filter-item', '.filter-reset');
-    parameter.classList.add('selected');
-    this.filtered = true;
+    this.dimOtherButtons(eventTarget, '.filter-item', '.filter-reset');
+    eventTarget.classList.add('selected');
+    this.applied = true;
   }
 
   reset() {
     this.upLightButtons('.filter-item');
     this.hideButton();
-    this.filtered = false;
+    this.applied = false;
   }
 
   showResetButton() {
@@ -40,11 +39,12 @@ export class Filter  {
     divider.textContent = ', ';
     all.textContent = 'all countries';
 
-    if (!this.filtered) {
+    if (this.applied == false) {
       this.place.append(divider);
       this.place.append(all);
     }
-    all.addEventListener('click', this.reset);
+    console.log(this.place);
+    all.addEventListener('click', this.reset.bind(this));
   }
 
   hideButton() {
@@ -71,9 +71,9 @@ export class Filter  {
     })
   }
 
-  filterData() {
-  this.data.filter(country => {
-    return country[this.parameter] === this.parameter;
+  filterData(data) {
+  return data.filter(country => {
+    return country[this.parameter] === this.filteredBy;
   })
 }
 }
