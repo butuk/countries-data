@@ -51,7 +51,6 @@ const year = new Text(initial + start, 'year').render(vis, width, 0);
 const controller = document.querySelector('.canvas');
 
 let tip;
-const filteredBy = 'continent';
 
 //Loading data and render visualization
 d3.json(dataPath).then(dataset => {
@@ -85,7 +84,7 @@ d3.json(dataPath).then(dataset => {
     buildLegend(data, range.get('continent'), colorScale);
 
     //Make legend to be a filter also
-    const filter = new Filter(filteredBy, 'false').render(h1, '.legend-item');
+    const filter = new Filter('continent', false).render(h1, '.legend-item');
 
     //Change visualization by interval
     new Interval(renderVizByInterval(data.length, data, scalesArr, filter)).run(speed).control(controller);
@@ -103,10 +102,11 @@ function buildLegend(data, items, colors) {
     items.forEach((item, index) => {
         const legendItem = new LegendItem(item, index).render(continentColor);
         legendItem.dataset.item = `${item}`;
+        const itemFormated = format.firstLetterBig(item);
 
         const v = index === 0 ? 'in ' : '';
         const comma = (index !== items.length - 1) ? ',' : '';
-        const text = document.createTextNode((`${v}${item}${comma}`));
+        const text = document.createTextNode((`${v}${itemFormated}${comma}`));
 
         legendItem.append(text);
         h1.append(legendItem);

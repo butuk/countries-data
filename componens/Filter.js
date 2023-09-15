@@ -14,11 +14,14 @@ export class Filter  {
   }
 
   apply(event) {
+    if(this.applied === false) {
+      this.showResetButton();
+    }
     const eventTarget = event.target;
     this.filteredBy = eventTarget.dataset.item;
-    this.showResetButton();
     this.dimOtherButtons(eventTarget, '.filter-item', '.filter-reset');
     eventTarget.classList.add('selected');
+
     this.applied = true;
   }
 
@@ -29,6 +32,7 @@ export class Filter  {
   }
 
   showResetButton() {
+
     const all = document.createElement('span');
     all.classList.add('filter-reset');
     all.classList.add('filter-item');
@@ -39,11 +43,9 @@ export class Filter  {
     divider.textContent = ', ';
     all.textContent = 'all countries';
 
-    if (this.applied == false) {
-      this.place.append(divider);
-      this.place.append(all);
-    }
-    console.log(this.place);
+    this.place.append(divider);
+    this.place.append(all);
+
     all.addEventListener('click', this.reset.bind(this));
   }
 
