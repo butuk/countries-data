@@ -29,27 +29,27 @@ const sizeTo = 5000;                    //Biggest circle size
 const opacity = .8;                     //Circles opacity
 const colorScale = d3.schemeAccent;     //Color range. Source: https://github.com/d3/d3-scale-chromatic
 
+//Canvas
+const svg = new Svg(VIZ.WIDTH, VIZ.HEIGHT, 'canvas').render('#container')
+const vis = new SvgGroup('viz').render(svg, VIZ.MARGIN.LEFT, VIZ.MARGIN.TOP);
+const h1 = document.querySelector('h1');
+
 //Time and timer variables
 const initial = 1800;
 const start = 0;
 let time = start;
-const speed = 100; //Time speed. In milliseconds
-const duration = speed - 1; //Animation speed
+const speed = 100; //Timeline speed. In milliseconds
+const duration = speed - 1; //Particles animation speed
 
-//Canvas
-const svg = new Svg(VIZ.WIDTH, VIZ.HEIGHT, 'canvas').render('#container')
-const vis = new SvgGroup('viz').render(svg, VIZ.MARGIN.LEFT, VIZ.MARGIN.TOP);
-
-const h1 = document.querySelector('h1');
+//Timer will be controlled by clicking the canvas
+const controller = document.querySelector('.canvas');
 
 //Adding text
 new Text('GDP per capita, $', 'labelY').render(svg, 0, 0);
 new Text('Life expectancy, years', 'labelX').render(svg, (VIZ.MARGIN.LEFT + width), ((VIZ.MARGIN.TOP + height + VIZ.MARGIN.BOTTOM)));
 const year = new Text(initial + start, 'year').render(vis, width, 0);
 
-//Timer will be controlled by clicking the canvas
-const controller = document.querySelector('.canvas');
-
+//Tooltip
 let tip;
 
 //Loading data and render visualization
@@ -65,7 +65,6 @@ d3.json(dataPath).then(dataset => {
             return country;
         });
     });
-
     const range = new Range(data);
 
     //Set scales
@@ -85,6 +84,7 @@ d3.json(dataPath).then(dataset => {
 
     //Make legend to be a filter also
     const filter = new Filter('continent', false).render(h1, '.legend-item');
+    filter.place.addEventListener('click', event => renewViz(event, data, scalesArr, filter));
 
     //Change visualization by interval
     new Interval(renderVizByInterval(data.length, data, scalesArr, filter)).run(speed).control(controller);
@@ -95,6 +95,7 @@ d3.json(dataPath).then(dataset => {
 }).catch(error => {
     console.log(error);
 });
+
 //Show tooltip on mouse hover
 function showTip(event) {
     const target = event.target;
@@ -118,6 +119,10 @@ function renderVizByInterval(amountOfTimes, data, scalesArr, filter) {
     }
 }
 
+function renewViz(event, data, funcs, filter) {
+    renderViz(data[time], funcs, filter);
+}
+
 //Rendering visualization
 function renderViz(data, [x, y, area, color], filter) {
     const t = d3.transition().duration(duration);
@@ -125,7 +130,7 @@ function renderViz(data, [x, y, area, color], filter) {
     const readyData = filter && filter.applied === true ? filter.filterData(data) : data;
 
     const points = vis.selectAll('circle')
-      .data(readyData, d => d.country); // d => d.country
+      .data(readyData, d => d.country);
     points.exit().remove();
     points.enter().append('circle')
         .attr('opacity', opacity)
